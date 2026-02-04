@@ -243,6 +243,15 @@
       color: var(--light);
       font-size: 1.05rem;
     }
+
+    /* Empêche la sélection du texte pour la case Remboursement */
+    #remboursement-container label {
+      -webkit-user-select: none; /* Safari */
+      -moz-user-select: none;    /* Firefox */
+      -ms-user-select: none;     /* IE10+/Edge */
+      user-select: none;         /* Standard */
+      cursor: default;
+    }
     
     .form-control {
       width: 100%;
@@ -270,7 +279,73 @@
       background-size: 16px;
       background-color: rgba(0, 0, 0, 0.2);
     }
-    
+
+    /* Styled checkbox for Remboursement */
+    .checkbox-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      color: var(--light);
+      font-weight: 600;
+      font-size: 1rem;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .checkbox-custom {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.06);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.22));
+      box-shadow: inset 0 -4px 8px rgba(0,0,0,0.45);
+      display: inline-block;
+      position: relative;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .checkbox-custom::after {
+      content: '';
+      width: 10px;
+      height: 6px;
+      border-left: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform: rotate(-45deg) scale(0);
+      opacity: 0;
+      position: absolute;
+      left: 5px;
+      top: 6px;
+      transition: var(--transition);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkbox-custom {
+      background: linear-gradient(135deg, #2ecc71, #1abc9c);
+      border-color: #2ecc71;
+      box-shadow: 0 8px 24px rgba(46,204,113,0.12), inset 0 -4px 8px rgba(0,0,0,0.45);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+      transform: rotate(-45deg) scale(1);
+      opacity: 1;
+    }
+
+    .checkbox-helper {
+      color: var(--grey);
+      font-size: 0.9rem;
+      margin-top: 6px;
+      margin-left: 34px; /* align with checkbox */
+    }
+
     .action-buttons {
       display: flex;
       gap: 15px;
@@ -500,11 +575,11 @@
           
           <div class="form-group">
             <label for="raison"><i class="fas fa-exclamation-triangle"></i> Type d'infraction :</label>
-            <select id="raison" class="form-control">
+            <select id="raison" class="form-control" onchange="gererAffichageMissile()">
               <option value="">-- Sélectionnez --</option>
               <option value="Anti-jeu">Anti-jeu</option>
               <option value="Kick Kill">Kick Kill</option>
-              <option value="Trahison à exploitation">Trahison à exploitation</option>
+              <option value="Trahison à exploitation">Trahison explosif</option>
               <option value="Focus nouveau joueur">Focus nouveau joueur</option>
               <option value="Assaut illégal">Assaut illégal</option>
               <option value="TP Combat">TP Combat</option>
@@ -513,12 +588,30 @@
               <option value="Use Bug">Use Bug</option>
               <option value="Missile illégal">Missile illégal</option>
               <option value="Boost Fs/MMR">Boost Fs/MMR</option>
+              <option value="Boost R&D">Boost R&D</option>
             </select>
           </div>
           
           <div class="form-group" id="plainte-raison-container" style="display: none;">
             <label for="plainte-raison"><i class="fas fa-exclamation-circle"></i> Raison :</label>
             <input type="text" id="plainte-raison" class="form-control" placeholder="Raison de la mise en attente ou du refus">
+          </div>
+
+          <div class="form-group" id="missile-tier-container" style="display: none;">
+            <label for="missile-tier"><i class="fas fa-rocket"></i> Type de missile :</label>
+            <select id="missile-tier" class="form-control">
+              <option value="T1">Missile T1</option>
+              <option value="T2">Missile T2</option>
+              <option value="T3">Missile T3</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="remboursement-container">
+            <label class="checkbox-label">
+              <input type="checkbox" id="remboursement">
+              <span class="checkbox-custom" aria-hidden="true"></span>
+              <span class="checkbox-text">Remboursement</span>
+            </label>
           </div>
           
           <div class="action-buttons">
@@ -888,6 +981,7 @@
           <div style="color: #bbb; font-family: monospace; font-size: 12px;">Décision prise par l'administration</div>
         </div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1030,6 +1124,7 @@
         <div style="color: #888; font-size: 12px;">SANCTION ADMINISTRATIVE</div>
         <div style="color: #e67e23; font-size: 16px; font-weight: bold;">Rollback de la zone</div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1102,6 +1197,7 @@
           <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">50 points</div>
         </div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1174,6 +1270,7 @@
           <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">10 points</div>
         </div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1246,6 +1343,7 @@
           <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">10 points</div>
         </div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1318,6 +1416,7 @@
           <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">10 points</div>
         </div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1390,6 +1489,7 @@
           <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">10 points</div>
         </div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1462,10 +1562,7 @@
           <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">20 points</div>
         </div>
       </div>
-      <div style="text-align: center; margin-top: 15px; color: #e67e23;">
-        <div style="color: #888; font-size: 12px;">SANCTION ADMINISTRATIVE</div>
-        <div style="color: #e67e23; font-size: 16px; font-weight: bold;">Si protection du stuff => remboursement</div>
-      </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1523,19 +1620,26 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
         <div style="text-align: center;">
           <div style="color: #888; font-size: 12px;">À LA VICTIME</div>
-          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;">(prix plan × nb plans × tier)</div>
-          <div style="color: #bbb; font-family: monospace; font-size: 12px;">Calcul selon le type de missile</div>
+          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;"><!--MISSILE_SANCTION_VICTIME--></div>
         </div>
         <div style="text-align: center;">
           <div style="color: #888; font-size: 12px;">ONU</div>
-          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;">(prix plan × nb plans × tier) ÷ 2</div>
-          <div style="color: #bbb; font-family: monospace; font-size: 12px;">Moitié du montant de la victime</div>
+          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;"><!--MISSILE_SANCTION_ONU--></div>
+        </div>
+        <div style="text-align: center;">
+          <div style="color: #888; font-size: 12px;">Toxicité</div>
+          <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">20 points</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="color: #888; font-size: 12px;">Missile</div>
+          <div style="color: #2dc26b; font-size: 20px; font-weight: bold;"><!--MISSILE_TIER_LINE--></div>
         </div>
       </div>
       <div style="text-align: center; margin-top: 15px; color: #e67e23;">
         <div style="color: #888; font-size: 12px;">SANCTION ADMINISTRATIVE</div>
         <div style="color: #e67e23; font-size: 16px; font-weight: bold;">Rollback de la zone</div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1593,19 +1697,26 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
         <div style="text-align: center;">
           <div style="color: #888; font-size: 12px;">À LA VICTIME</div>
-          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;">30.000$ à 50.000$</div>
-          <div style="color: #bbb; font-family: monospace; font-size: 12px;">Montant selon gravité</div>
+          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;">10.000$</div>
         </div>
         <div style="text-align: center;">
           <div style="color: #888; font-size: 12px;">ONU</div>
-          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;">15.000$ à 25.000$</div>
-          <div style="color: #bbb; font-family: monospace; font-size: 12px;">Montant selon gravité</div>
+          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;">10.000$</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="color: #888; font-size: 12px;">JAIL</div>
+          <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">2h</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="color: #888; font-size: 12px;">Toxicité</div>
+          <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">20 points</div>
         </div>
       </div>
       <div style="text-align: center; margin-top: 15px; color: #e67e23;">
         <div style="color: #888; font-size: 12px;">SANCTION ADMINISTRATIVE</div>
-        <div style="color: #e67e23; font-size: 16px; font-weight: bold;">Clear du boost</div>
+        <div style="color: #e67e23; font-size: 16px; font-weight: bold;">Clear du boost FS/MMR</div>
       </div>
+      <!--REMBOURSEMENT_LINE-->
     </div>
     
     <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
@@ -1615,6 +1726,83 @@
       </div>
     </div>
     
+    <div style="text-align: center; color: #888; font-size: 12px; margin-top: 25px; padding-top: 15px; border-top: 1px solid #333;">
+      Décision prise en application du Codex NationsGlory Black<br>
+      <span style="color: #ffffff;">${pseudo} Modérateur</span> • © 2025 NationsGlory
+    </div>
+  </div>
+</div>`;
+      },
+
+      // Boost R&D (copied from Boost Fs/MMR)
+      'Boost R&D': (accuse, victime, pseudo) => {
+        return `<div style="margin: auto; width: 100%; background: #0a0a0a; border-left: 4px solid #2ecc71; padding: 20px 30px;">
+  <div style="text-align: center; margin-bottom: 20px;">
+    <img src="https://static.nationsglory.fr/_NN5G5_y5.png" alt="NationsGlory Black" style="height: 60px; margin-bottom: 10px;">
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-size: 16px; color: #e0e0e0; font-weight: bold; letter-spacing: 1px;"> DÉCISION OFFICIELLE - SECTION BLACK </div>
+  </div>
+  <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #e0e0e0; line-height: 1.6;">
+    <div style="text-align: center; margin-bottom: 25px;">
+      <span style="font-size: 18px; color: #ffffff;">À l'attention de </span>
+      <span style="font-size: 18px; color: #2ecc71;">${victime}</span>
+    </div>
+
+    <div style="background: #1a1a1a; padding: 25px; border-radius: 8px; margin-bottom: 25px; border: 2px solid #2ecc71; text-align: center;">
+      <div style="color: #2ecc71; font-size: 24px; font-weight: bold; margin-bottom: 15px;"> ✅ PLAINTE ACCEPTÉE </div>
+      <div style="color: #e0e0e0; font-size: 16px;">
+        Votre plainte contre <span style="color: #ffffff; font-weight: bold;">${accuse}</span> a été <span style="color: #2ecc71; font-weight: bold;">acceptée</span> pour l'infraction de Boost R&D.
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+      <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #333;">
+        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">COUPABLE</div>
+        <div style="color: #ffffff; font-size: 16px; font-weight: bold;">${accuse}</div>
+      </div>
+      <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #333;">
+        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">VICTIME</div>
+        <div style="color: #ffffff; font-size: 16px; font-weight: bold;">${victime}</div>
+      </div>
+      <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid #333;">
+        <div style="color: #888; font-size: 12px; margin-bottom: 5px;">INFRACTION</div>
+        <div style="color: #ffffff; font-size: 16px; font-weight: bold;">Boost R&D</div>
+      </div>
+    </div>
+
+    <div style="background: #1a1a1a; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #333;">
+      <div style="color: #ffffff; font-weight: bold; margin-bottom: 15px; text-align: center; border-bottom: 1px solid #333; padding-bottom: 10px;">SANCTIONS APPLIQUÉES</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+        <div style="text-align: center;">
+          <div style="color: #888; font-size: 12px;">À LA VICTIME</div>
+          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;">15.000$</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="color: #888; font-size: 12px;">ONU</div>
+          <div style="color: #2dc26b; font-size: 18px; font-weight: bold;">15.000$</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="color: #888; font-size: 12px;">JAIL</div>
+          <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">2h</div>
+        </div>
+        <div style="text-align: center;">
+          <div style="color: #888; font-size: 12px;">Toxicité</div>
+          <div style="color: #2dc26b; font-size: 20px; font-weight: bold;">25 points</div>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 15px; color: #e67e23;">
+        <div style="color: #888; font-size: 12px;">SANCTION ADMINISTRATIVE</div>
+        <div style="color: #e67e23; font-size: 16px; font-weight: bold;">Clear du boost R&D</div>
+      </div>
+      <!--REMBOURSEMENT_LINE-->
+    </div>
+
+    <div style="background: #1a1a1a; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #333;">
+      <div style="color: #ffffff; font-weight: bold; margin-bottom: 10px; text-align: center;"> ⚠️ MENTIONS OBLIGATOIRES </div>
+      <div style="color: #bbb; font-size: 13px; text-align: center;">
+        Toutefois, si la décision du Gouvernement d'Orion ne vous convient pas, vous pouvez dès lors faire une cour d'appel, afin que votre sanction soit rejugée, la haute instance d'Orion s'occupera de votre cour d'appel dans un temps indéterminé. Concernant le paiement, si celui-ci n'est pas effectué sous 7 jours, à compter de la publication de ce message, avec des preuves datées du paiement sous le dit message, votre amende sera doublée et prise de force par la haute instance d'Orion.
+      </div>
+    </div>
+
     <div style="text-align: center; color: #888; font-size: 12px; margin-top: 25px; padding-top: 15px; border-top: 1px solid #333;">
       Décision prise en application du Codex NationsGlory Black<br>
       <span style="color: #ffffff;">${pseudo} Modérateur</span> • © 2025 NationsGlory
@@ -1724,6 +1912,18 @@
       }
     }
 
+    // Affiche/masque le sélecteur de tier pour Missile
+    function gererAffichageMissile() {
+      const raison = document.getElementById('raison').value;
+      const container = document.getElementById('missile-tier-container');
+      if (!container) return;
+      if (raison === 'Missile illégal') {
+        container.style.display = 'block';
+      } else {
+        container.style.display = 'none';
+      }
+    }
+
     // Fonction de gestion de l'affichage de la raison pour Guerre
     function gererAffichageGuerreRaison() {
       const type = document.getElementById('guerre-type').value;
@@ -1793,7 +1993,34 @@
         if (!raison) {
           message = 'Veuillez sélectionner un type d\'infraction.';
         } else if (templates[raison]) {
+          const rembChecked = document.getElementById('remboursement') ? document.getElementById('remboursement').checked : false;
           message = templates[raison](accuse, victime, pseudo);
+
+          // Si Missile illégal : adapter le message selon le tier sélectionné
+          if (raison === 'Missile illégal') {
+            const missileTier = document.getElementById('missile-tier') ? document.getElementById('missile-tier').value : 'T1';
+            let victimeAmount = '2.500$';
+            if (missileTier === 'T1') victimeAmount = '2.500$';
+            else if (missileTier === 'T2') victimeAmount = '5.000$';
+            else victimeAmount = '10.000$';
+            const onuAmount = victimeAmount; // ONU reçoit le même montant
+            const tierLine = `<div style="text-align:center; color:#2dc26b; font-weight:bold; margin-bottom:10px;">Type de missile : ${missileTier}</div>`;
+            message = message.replace('<!--MISSILE_SANCTION_VICTIME-->', victimeAmount);
+            message = message.replace('<!--MISSILE_SANCTION_ONU-->', onuAmount);
+            message = message.replace('<!--MISSILE_TIER_LINE-->', tierLine);
+          }
+
+          // Si la case Remboursement est cochée, on injecte le bloc correspondant.
+          if (rembChecked) {
+            const rembBlock = `<div style="text-align: center; margin-top: 15px; color: #e67e23;">
+        <div style="color: #888; font-size: 12px;">SANCTION ADMINISTRATIVE</div>
+        <div style="color: #e67e23; font-size: 16px; font-weight: bold;">Remboursement du stuff présent sur le screen dans le message en dessous</div>
+      </div>`;
+
+            if (message.includes('<!--REMBOURSEMENT_LINE-->')) {
+              message = message.replace('<!--REMBOURSEMENT_LINE-->', rembBlock);
+            }
+          }
         } else {
           message = `<div style="margin: auto; width: 100%; background: #0a0a0a; border-left: 4px solid #2ecc71; padding: 20px 30px;">
   <div style="text-align: center; margin-bottom: 20px;">
